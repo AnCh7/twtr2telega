@@ -1,4 +1,4 @@
-certifi==2016.8.8
+certifi==2017.4.17
 envparse==0.1.6
 future==0.15.2
 oauthlib==1.0.3
@@ -9,4 +9,4 @@ requests-oauthlib==0.5.0
 six==1.10.0
 tweepy==3.4.0
 urllib3==1.24.2
-pytz
+pytz==2020.1
