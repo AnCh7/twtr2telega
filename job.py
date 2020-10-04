@@ -62,12 +62,16 @@ class FetchAndSendTweetsJob(Job):
                     self.logger.debug("Fetching latest tweet by {}".format(tw_user.screen_name))
                     tweets = bot.tw.user_timeline(screen_name=tw_user.screen_name,
                                                   count=1,
-                                                  tweet_mode='extended')
+                                                  tweet_mode='extended',
+                                                  include_rts=False,
+                                                  exclude_replies=True)
                 else:
                     self.logger.debug("Fetching new tweets from {}".format(tw_user.screen_name))
                     tweets = bot.tw.user_timeline(screen_name=tw_user.screen_name,
                                                   since_id=tw_user.last_tweet_id,
-                                                  tweet_mode='extended')
+                                                  tweet_mode='extended',
+                                                  include_rts=False,
+                                                  exclude_replies=True)
                 updated_tw_users.append(tw_user)
             except tweepy.error.TweepError as e:
                 sc = e.response.status_code

@@ -27,8 +27,7 @@ class TwitterForwarderBot(Bot):
         try:
             self.logger.debug("Sending tweet {} to chat {}...".format(tweet.tw_id, chat.chat_id))
 
-            # Use a soft-hyphen to put an invisible link to the first image in the tweet
-            # which will then be displayed as preview
+            # Use a soft-hyphen to put an invisible link to the first image in the tweet which will then be displayed as preview
             photo_url = ''
             if tweet.photo_url:
                 photo_url = '[\xad](%s)' % tweet.photo_url
