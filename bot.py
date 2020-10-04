@@ -12,12 +12,13 @@ from util import escape_markdown, prepare_tweet_text
 
 class TwitterForwarderBot(Bot):
 
-    def __init__(self, token, tweepy_api_object, update_offset=0):
+    def __init__(self, token, chat_id, tweepy_api_object, update_offset=0):
         super().__init__(token=token)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info("Initializing")
         self.update_offset = update_offset
         self.tw = tweepy_api_object
+        self.chat_id = chat_id
 
     def reply(self, update, text, *args, **kwargs):
         self.sendMessage(chat_id=update.message.chat.id, text=text, *args, **kwargs)
@@ -47,7 +48,7 @@ class TwitterForwarderBot(Bot):
                               screen_name=tweet.screen_name,
                               tw_id=tweet.tw_id)
 
-            self.sendMessage(chat_id=chat.chat_id,
+            self.sendMessage(chat_id=self.chat_id,
                              disable_web_page_preview=not photo_url,
                              text=text,
                              parse_mode=telegram.ParseMode.MARKDOWN)

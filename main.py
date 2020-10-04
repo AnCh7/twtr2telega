@@ -11,11 +11,12 @@ from commands import *
 from job import FetchAndSendTweetsJob
 
 env = Env(
+    TELEGRAM_BOT_TOKEN=str,
+    TELEGRAM_CHAT_ID=str,
     TWITTER_API_KEY=str,
     TWITTER_API_KEY_SECRET=str,
     TWITTER_ACCESS_TOKEN=str,
     TWITTER_ACCESS_TOKEN_SECRET=str,
-    TELEGRAM_BOT_TOKEN=str,
 )
 
 if __name__ == '__main__':
@@ -27,7 +28,6 @@ if __name__ == '__main__':
 
     # initialize Twitter API
     auth = tweepy.OAuthHandler(env('TWITTER_API_KEY'), env('TWITTER_API_KEY_SECRET'))
-
     try:
         auth.set_access_token(env('TWITTER_ACCESS_TOKEN'), env('TWITTER_ACCESS_TOKEN_SECRET'))
     except KeyError:
@@ -39,7 +39,8 @@ if __name__ == '__main__':
 
     # initialize Telegram API
     token = env('TELEGRAM_BOT_TOKEN')
-    updater = Updater(bot=TwitterForwarderBot(token, twapi))
+    chat_id = env('TELEGRAM_CHAT_ID')  # always using same chat
+    updater = Updater(bot=TwitterForwarderBot(token, chat_id, twapi))
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', cmd_start))

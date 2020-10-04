@@ -90,7 +90,7 @@ class FetchAndSendTweetsJob(Job):
 
                 # Check if tweet contains media, else check if it contains a link to an image
                 extensions = ('.jpg', '.jpeg', '.png', '.gif')
-                pattern = '[(%s)]$' % ')('.join(extensions)
+                pattern = '[(%subscription)]$' % ')('.join(extensions)
                 photo_url = ''
                 tweet_text = html.unescape(tweet.full_text)
                 if 'media' in tweet.entities:
@@ -142,35 +142,35 @@ class FetchAndSendTweetsJob(Job):
 
         # send new tweets to subscribers
         subscriptions = list(Subscription.select().where(Subscription.tw_user << updated_tw_users))
-        for s in subscriptions:
+        for subscription in subscriptions:
             # send all new tweets
-            self.logger.debug("Checking subscription {} {}".format(s.tg_chat.chat_id, s.tw_user.screen_name))
+            self.logger.debug("Checking subscription {} {}".format(subscription.tg_chat.chat_id, subscription.tw_user.screen_name))
 
-            if s.last_tweet_id == 0:  # didn't receive any tweet yet
+            if subscription.last_tweet_id == 0:  # didn't receive any tweet yet
                 try:
-                    tw = s.tw_user.tweets.select() \
+                    tw = subscription.tw_user.tweets.select() \
                         .order_by(Tweet.tw_id.desc()) \
                         .first()
                     if tw is None:
                         self.logger.warning("Something fishy is going on here...")
                     else:
-                        bot.send_tweet(s.tg_chat, tw)
+                        bot.send_tweet(subscription.tg_chat, tw)
                         # save the latest tweet sent on this subscription
-                        s.last_tweet_id = tw.tw_id
-                        s.save()
+                        subscription.last_tweet_id = tw.tw_id
+                        subscription.save()
                 except IndexError:
-                    self.logger.debug("- No tweets available yet on {}".format(s.tw_user.screen_name))
+                    self.logger.debug("- No tweets available yet on {}".format(subscription.tw_user.screen_name))
 
                 continue
 
-            if s.tw_user.last_tweet_id > s.last_tweet_id:
+            if subscription.tw_user.last_tweet_id > subscription.last_tweet_id:
                 self.logger.debug("- Some fresh tweets here!")
-                for tw in (s.tw_user.tweets.select().where(Tweet.tw_id > s.last_tweet_id).order_by(Tweet.tw_id.asc())):
-                    bot.send_tweet(s.tg_chat, tw)
+                for tw in (subscription.tw_user.tweets.select().where(Tweet.tw_id > subscription.last_tweet_id).order_by(Tweet.tw_id.asc())):
+                    bot.send_tweet(subscription.tg_chat, tw)
 
                 # save the latest tweet sent on this subscription
-                s.last_tweet_id = s.tw_user.last_tweet_id
-                s.save()
+                subscription.last_tweet_id = subscription.tw_user.last_tweet_id
+                subscription.save()
                 continue
 
             self.logger.debug("- No new tweets here.")
@@ -183,14 +183,14 @@ class FetchAndSendTweetsJob(Job):
                 self.logger.debug("- Cleaning up subs on user @{}, {}".format(tw_user.screen_name, reason))
                 message = INFO_CLEANUP[reason].format(tw_user.screen_name)
                 subs = list(tw_user.subscriptions)
-                for s in subs:
-                    chat = s.tg_chat
+                for subscription in subs:
+                    chat = subscription.tg_chat
                     if chat.delete_soon:
                         self.logger.debug("- - skipping because of delete_soon chat id={}".format(chat_id))
                         continue
                     chat_id = chat.chat_id
                     self.logger.debug("- - bye on chat id={}".format(chat_id))
-                    s.delete_instance()
+                    subscription.delete_instance()
 
                     try:
                         bot.sendMessage(chat_id=chat_id, text=message)
