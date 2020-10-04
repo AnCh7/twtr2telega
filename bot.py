@@ -40,7 +40,7 @@ class TwitterForwarderBot(Bot):
             created_at = created_dt.strftime('%Y-%m-%d %H:%M:%S %Z')
 
             text = """
-{link_preview}[{name}](https://twitter.com/{screen_name}/status/{tw_id}):
+{link_preview}[{name}](https://twitter.com/{screen_name}/status/{tw_id})
 {text}
                    """.format(link_preview=photo_url,
                               text=prepare_tweet_text(tweet.text),
