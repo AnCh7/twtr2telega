@@ -39,14 +39,12 @@ class TwitterForwarderBot(Bot):
             created_at = created_dt.strftime('%Y-%m-%d %H:%M:%S %Z')
 
             text = """
-{link_preview}*{name}* ([@{screen_name}](https://twitter.com/{screen_name})) at {created_at}:
+{link_preview}[{name}](https://twitter.com/{screen_name}/status/{tw_id}):
 {text}
--- [Link to this Tweet](https://twitter.com/{screen_name}/status/{tw_id})
                    """.format(link_preview=photo_url,
                               text=prepare_tweet_text(tweet.text),
                               name=escape_markdown(tweet.name),
                               screen_name=tweet.screen_name,
-                              created_at=created_at,
                               tw_id=tweet.tw_id)
 
             self.sendMessage(chat_id=chat.chat_id,
