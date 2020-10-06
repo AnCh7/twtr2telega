@@ -36,15 +36,16 @@ class TwitterForwarderBot(Bot):
             if chat.timezone_name is not None:
                 tz = timezone(chat.timezone_name)
                 created_dt = created_dt.astimezone(tz)
-            created_at = created_dt.strftime('%Y-%m-%d %H:%M:%S %Z')
+            created_at = created_dt.strftime('%Y-%m-%d %H:%M:%S')
 
             text = """
-{link_preview}[{name}](https://twitter.com/{screen_name}/status/{tw_id})
+{link_preview}[{name}](https://twitter.com/{screen_name}/status/{tw_id}) at {created_at}:
 {text}
                    """.format(link_preview=photo_url,
                               text=prepare_tweet_text(tweet.text),
                               name=escape_markdown(tweet.name),
                               screen_name=tweet.screen_name,
+                              created_at=created_at,
                               tw_id=tweet.tw_id)
 
             self.sendMessage(chat_id=self.chat_id,
