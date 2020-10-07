@@ -2,7 +2,7 @@
 
 AWS_ACCOUNT_ID=xxxxxxxxxx
 NAME=twtr2telega
-TAG=1
+TAG=latest
 
 OUTPUT="$(aws ecr get-login --no-include-email --region us-east-1)"
 ${OUTPUT}
