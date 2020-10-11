@@ -14,10 +14,6 @@ from util import with_touched_chat, escape_markdown, markdown_twitter_usernames
 TIMEZONE_LIST_URL = "https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
 
 
-def cmd_ping(bot, update):
-    bot.reply(update, 'Pong!')
-
-
 @with_touched_chat
 def cmd_start(bot, update, chat=None):
     bot.reply(update,

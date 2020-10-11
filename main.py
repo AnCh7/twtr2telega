@@ -45,7 +45,6 @@ if __name__ == '__main__':
 
     dispatcher.add_handler(CommandHandler('start', cmd_start))
     dispatcher.add_handler(CommandHandler('help', cmd_help))
-    dispatcher.add_handler(CommandHandler('ping', cmd_ping))
     dispatcher.add_handler(CommandHandler('sub', cmd_sub, pass_args=True))
     dispatcher.add_handler(CommandHandler('unsub', cmd_unsub, pass_args=True))
     dispatcher.add_handler(CommandHandler('list', cmd_list))
