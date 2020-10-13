@@ -12,13 +12,15 @@ from util import escape_markdown, prepare_tweet_text
 
 class TwitterForwarderBot(Bot):
 
-    def __init__(self, token, chat_id, tweepy_api_object, update_offset=0):
+    def __init__(self, token, chat_id, admin_id, tweepy_api_object, update_offset=0):
         super().__init__(token=token)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info("Initializing")
         self.update_offset = update_offset
         self.tw = tweepy_api_object
+
         self.chat_id = chat_id
+        self.admin_id = admin_id
 
     def reply(self, update, text, *args, **kwargs):
         self.sendMessage(chat_id=update.message.chat.id, text=text, *args, **kwargs)

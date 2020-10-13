@@ -16,6 +16,9 @@ TIMEZONE_LIST_URL = "https://en.wikipedia.org/wiki/List_of_tz_database_time_zone
 
 @with_touched_chat
 def cmd_start(bot, update, chat=None):
+    if restrict_access(bot, update):
+        return
+
     bot.reply(update,
               "Hello! This bot lets you subscribe to twitter accounts and receive their tweets here! "
               "Check out /help for more info.")
@@ -23,6 +26,9 @@ def cmd_start(bot, update, chat=None):
 
 @with_touched_chat
 def cmd_help(bot, update, chat=None):
+    if restrict_access(bot, update):
+        return
+
     text = """
 Hello! This bot forwards you updates from twitter streams!
 Here's the commands:
@@ -36,18 +42,19 @@ Here's the commands:
 - /verify - send Twitter verifier code to complete authorization process
 - /export\_friends - generate /sub command to subscribe to all your Twitter friends (authorization required)
 - /set\_timezone - set your [timezone name]({}) (for example Asia/Tokyo)
-- /source - info about source code
 - /help - view help text
-This bot is free open source software, check /source if you want to host it!
 """.format(TIMEZONE_LIST_URL)
     bot.reply(update, text, disable_web_page_preview=True, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 @with_touched_chat
 def cmd_sub(bot, update, args, chat=None):
+    if restrict_access(bot, update):
+        return
     if len(args) < 1:
         bot.reply(update, "Use /sub username1 username2 username3 ...")
         return
+
     tw_usernames = args
     not_found = []
     already_subscribed = []
@@ -91,6 +98,8 @@ def cmd_sub(bot, update, args, chat=None):
 
 @with_touched_chat
 def cmd_unsub(bot, update, args, chat=None):
+    if restrict_access(bot, update):
+        return
     if len(args) < 1:
         bot.reply(update, "Use /unsub username1 username2 username3 ...")
         return
@@ -127,8 +136,10 @@ def cmd_unsub(bot, update, args, chat=None):
 
 @with_touched_chat
 def cmd_list(bot, update, chat=None):
-    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
+    if restrict_access(bot, update):
+        return
 
+    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
     if len(subscriptions) == 0:
         return bot.reply(update, 'You have no subscriptions yet! Add one with /sub username')
 
@@ -137,7 +148,6 @@ def cmd_list(bot, update, chat=None):
         subs.append(sub.tw_user.full_name)
 
     subject = "This group is" if chat.is_group else "You are"
-
     bot.reply(update,
               subject + " subscribed to the following Twitter users:\n" +
               "\n - ".join(subs) + "\n\nYou can remove any of them using /unsub username")
@@ -145,8 +155,10 @@ def cmd_list(bot, update, chat=None):
 
 @with_touched_chat
 def cmd_export(bot, update, chat=None):
-    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
+    if restrict_access(bot, update):
+        return
 
+    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
     if len(subscriptions) == 0:
         return bot.reply(update, 'You have no subscriptions yet! Add one with /sub username')
 
@@ -160,27 +172,29 @@ def cmd_export(bot, update, chat=None):
 
 @with_touched_chat
 def cmd_wipe(bot, update, chat=None):
-    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
+    if restrict_access(bot, update):
+        return
 
+    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
     subs = "You had no subscriptions."
     if subscriptions:
         subs = ''.join(["For the record, you were subscribed to these users: ",
                         ', '.join((s.tw_user.screen_name for s in subscriptions)),
                         '.'])
-
     bot.reply(update, "Okay, I'm forgetting about this chat. " + subs + " Come back to me anytime you want. Goodbye!")
     chat.delete_instance(recursive=True)
 
 
 @with_touched_chat
 def cmd_all(bot, update, chat=None):
-    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
+    if restrict_access(bot, update):
+        return
 
+    subscriptions = list(Subscription.select().where(Subscription.tg_chat == chat))
     if len(subscriptions) == 0:
         return bot.reply(update, 'You have no subscriptions, so no tweets to show!')
 
     text = ""
-
     for sub in subscriptions:
         if sub.last_tweet is None:
             text += "\n{screen_name}: <no tweets yet>".format(screen_name=escape_markdown(sub.tw_user.screen_name))
@@ -196,6 +210,9 @@ def cmd_all(bot, update, chat=None):
 
 @with_touched_chat
 def cmd_get_auth_url(bot, update, chat):
+    if restrict_access(bot, update):
+        return
+
     auth = OAuthHandler(bot.tw.auth.consumer_key, bot.tw.auth.consumer_secret)
     auth_url = auth.get_authorization_url()
     chat.twitter_request_token = json.dumps(auth.request_token)
@@ -206,16 +223,18 @@ def cmd_get_auth_url(bot, update, chat):
 
 @with_touched_chat
 def cmd_verify(bot, update, args, chat):
+    if restrict_access(bot, update):
+        return
     if not chat.twitter_request_token:
         bot.reply(update, "Use /auth command first")
         return
     if len(args) < 1:
         bot.reply(update, "No verifier code specified")
         return
+
     verifier_code = args[0]
     auth = OAuthHandler(bot.tw.auth.consumer_key, bot.tw.auth.consumer_secret)
     auth.request_token = json.loads(chat.twitter_request_token)
-
     try:
         auth.get_access_token(verifier_code)
     except TweepError:
@@ -234,6 +253,8 @@ def cmd_verify(bot, update, args, chat):
 
 @with_touched_chat
 def cmd_export_friends(bot, update, chat):
+    if restrict_access(bot, update):
+        return
     if not chat.is_authorized:
         if not chat.twitter_request_token:
             bot.reply(update, "You have not authorized yet. Use /auth to do it")
@@ -250,6 +271,8 @@ def cmd_export_friends(bot, update, chat):
 
 @with_touched_chat
 def cmd_set_timezone(bot, update, args, chat):
+    if restrict_access(bot, update):
+        return
     if len(args) < 1:
         bot.reply(update,
                   "No timezone specified. Find yours [here]({})!".format(TIMEZONE_LIST_URL),
@@ -257,7 +280,6 @@ def cmd_set_timezone(bot, update, args, chat):
         return
 
     tz_name = args[0]
-
     try:
         tz = timezone(tz_name)
         chat.timezone_name = tz_name
@@ -272,4 +294,14 @@ def cmd_set_timezone(bot, update, args, chat):
 
 @with_touched_chat
 def handle_chat(bot, update, chat=None):
+    if restrict_access(bot, update):
+        return
+
     bot.reply(update, "Hey! Use commands to talk with me, please! See /help")
+
+
+def restrict_access(bot, update):
+    if update.message.from_user.id != bot.admin_id:
+        bot.reply(update, "Please subscribe to: " + 'https://t.me/' + bot.chat_id)
+        return True
+    return False

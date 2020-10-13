@@ -40,7 +40,8 @@ if __name__ == '__main__':
     # initialize Telegram API
     token = env('TELEGRAM_BOT_TOKEN')
     chat_id = env('TELEGRAM_CHAT_ID')  # always using same chat
-    updater = Updater(bot=TwitterForwarderBot(token, chat_id, twapi))
+    admin_id = int(env('TELEGRAM_ADMIN_ID'))  # only admin can use this bot
+    updater = Updater(bot=TwitterForwarderBot(token, chat_id, admin_id, twapi))
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', cmd_start))
