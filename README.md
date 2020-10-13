@@ -55,6 +55,11 @@ sudo scp -i \
 ```bash
 ssh -i "xxxxxxxx.pem" xxxxxxxx@yyyyyyyyy.compute-1.amazonaws.com
 ```
+1. Stop and remove container:
+```bash
+docker stop twtr2telega
+docker rm twtr2telega
+``` 
 1. Run `run.sh`
 
 ### Docker commands

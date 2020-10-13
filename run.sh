@@ -5,8 +5,7 @@ NAME=twtr2telega
 LOG_GROUP=twtr2telega
 TAG=latest
 
-OUTPUT="$(aws ecr get-login --no-include-email --region us-east-1)"
-${OUTPUT}
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
 
 docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${NAME}:${TAG}
 docker run -d \
