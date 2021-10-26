@@ -42,9 +42,10 @@ python main.py
 
 ### Deployment to AWS EC2
 1. Update AWS_ACCOUNT_ID in build.sh and run.sh files.
-1. Create ECR repo.
-1. Run `build.sh`.
-1. Copy files to EC2:
+2. Create ECR repo.
+3. Increase TAG (build.sh and run.sh)
+4. Run `build.sh`.
+5. Copy files to EC2:
 ```
 sudo scp -i \
     "~/.ssh/xxxxxxxx.pem" \
@@ -59,14 +60,16 @@ ssh -i "xxxxxxxx.pem" xxxxxxxx@yyyyyyyyy.compute-1.amazonaws.com
 ```bash
 docker stop twtr2telega
 docker rm twtr2telega
+cd /home/ec2-user/twtr2telega
 ``` 
 1. Run `run.sh`
 
 ### Docker commands
 ```bash
-docker build --pull --rm -f "Dockerfile" -t twtr2telega:2 "."
+docker build --pull --rm -f "Dockerfile" -t twtr2telega:latest "."
 docker run -it --rm \
     --env-file secrets.env \
     --mount type=bind,source=$(pwd)/peewee.db,target=/usr/app/twtr2telega/peewee.db \
-    twtr2telega:2
+    twtr2telega:latest
+```
 ```
