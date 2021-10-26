@@ -18,15 +18,15 @@ Bot that forwards messages from Twitter to Telegram users, groups or channels.
 Fill secrets.env file.
 
 #### 4. Python and virtualenv
-Install pyenv and python 3.5.9:
+Install pyenv and python 3.6.12:
 ```bash
 brew install openssl readline sqlite3 xz zlib
 curl https://pyenv.run | bash
-pyenv install 3.5.9
+pyenv install 3.6.12
 ```
 Create virtual environment and install packages:
 ```bash
-pyenv virtualenv 3.5.9 twtr2telega
+pyenv virtualenv 3.6.12 twtr2telega
 pyenv local twtr2telega
 pip install -r requirements.txt
 ```
@@ -64,9 +64,9 @@ docker rm twtr2telega
 
 ### Docker commands
 ```bash
-docker build --pull --rm -f "Dockerfile" -t twtr2telega:latest "."
+docker build --pull --rm -f "Dockerfile" -t twtr2telega:2 "."
 docker run -it --rm \
     --env-file secrets.env \
     --mount type=bind,source=$(pwd)/peewee.db,target=/usr/app/twtr2telega/peewee.db \
-    twtr2telega:latest
+    twtr2telega:2
 ```

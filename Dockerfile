@@ -1,6 +1,6 @@
-FROM python:3.5.9
+FROM python:3.6.12
 
-LABEL version="0.1.0"
+LABEL version="0.2.0"
 LABEL name="twtr2telega"
 
 WORKDIR /usr/app/twtr2telega
